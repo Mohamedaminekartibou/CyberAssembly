@@ -93,3 +93,18 @@ public class RobotTask implements Runnable {
 
 
 }
+
+/* Orden
+Comprobar emergencia
+
+Recoger batería de la cinta
+
+Solicitar estación de soldadura
+
+Fabricar el coche
+
+Liberar estación
+
+Firmar certificado de calidad
+
+Repetir hasta terminar los coches */
