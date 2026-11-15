@@ -58,6 +58,8 @@ public class CentralSoldadura {
         semaforo.release();
     }
 
-
+    public synchronized boolean[] getEstadoEstaciones() {
+        return estacionesOcupadas.clone();
+    }
 
 }
