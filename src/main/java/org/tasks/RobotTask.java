@@ -2,7 +2,6 @@
 package org.tasks;
 
 import org.model.Bateria;
-
 import org.model.concurrency.CentralSoldadura;
 import org.model.concurrency.CintaTransportadora;
 import org.model.concurrency.SupervisorCentral;
@@ -32,16 +31,15 @@ public class RobotTask implements Runnable {
         this.supervisorCentral = supervisorCentral;
     }
 
-
     @Override
     public void run() {
 
         System.out.println(nombre + " ha comenzado a trabajar.");
 
         try {
+
             for (int i = 1; i <= cochesAFabricar; i++) {
 
-                // Comprobar si existe una emergencia
                 supervisorCentral.esperarSiHayEmergencia(nombre);
 
                 System.out.println(nombre + " solicita una batería.");
@@ -50,31 +48,47 @@ public class RobotTask implements Runnable {
 
                 System.out.println(nombre + " ha recogido " + bateria);
 
-                // Volver a comprobar antes de soldar
                 supervisorCentral.esperarSiHayEmergencia(nombre);
 
                 int estacion = -1;
                 boolean estacionOcupada = false;
 
                 try {
-                    estacion = centralSoldadura.ocuparEstacion();
+
+                    // Comprobar si la batería es crítica
+                    boolean bateriaCritica = bateria.esCritica();
+
+                    // Solicitar estación indicando la prioridad
+                    estacion = centralSoldadura.ocuparEstacion(
+                            bateriaCritica
+                    );
+
                     estacionOcupada = true;
 
-                    System.out.println(nombre +
-                            " está soldando en la estación " + (estacion + 1));
+                    if (bateriaCritica) {
+                        System.out.println(
+                                nombre + " tiene prioridad por llevar una batería crítica."
+                        );
+                    }
+
+                    System.out.println(
+                            nombre + " está soldando en la estación "
+                                    + (estacion + 1)
+                    );
 
                     Thread.sleep(2000);
 
-                    System.out.println(nombre +
-                            " ha terminado de fabricar el coche " + i);
+                    System.out.println(
+                            nombre + " ha terminado de fabricar el coche " + i
+                    );
 
                 } finally {
+
                     if (estacionOcupada) {
                         centralSoldadura.liberarEstacion(estacion);
                     }
                 }
 
-                // Comprobar antes de registrar el certificado
                 supervisorCentral.esperarSiHayEmergencia(nombre);
 
                 taulerRegistreCentral.registrarCertificat(nombre);
@@ -88,20 +102,4 @@ public class RobotTask implements Runnable {
 
         System.out.println(nombre + " ha terminado su trabajo.");
     }
-
 }
-
-/* Orden
-Comprobar emergencia
-
-Recoger batería de la cinta
-
-Solicitar estación de soldadura
-
-Fabricar el coche
-
-Liberar estación
-
-Firmar certificado de calidad
-
-Repetir hasta terminar los coches */
