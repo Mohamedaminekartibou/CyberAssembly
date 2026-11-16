@@ -19,13 +19,10 @@ public class SupervisorCentral {
     }
 
     // Los robots esperan si hay una emergencia
-    public synchronized void esperarSiHayEmergencia()
-            throws InterruptedException {
+    public synchronized void esperarSiHayEmergencia(String nombreRobot) throws InterruptedException {
 
         while (emergenciaActiva) {
-
-            System.out.println(Thread.currentThread().getName() + " está esperando por emergencia.");
-
+            System.out.println(nombreRobot + " está esperando por emergencia.");
             wait();
         }
     }

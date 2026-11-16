@@ -40,7 +40,7 @@ public class RobotTask implements Runnable {
             for (int i = 1; i <= cochesAFabricar; i++) {
 
                 // Comprobar si existe una emergencia
-                supervisorCentral.esperarSiHayEmergencia();
+                supervisorCentral.esperarSiHayEmergencia(nombre);
 
                 System.out.println(nombre + " solicita una batería.");
 
@@ -49,7 +49,7 @@ public class RobotTask implements Runnable {
                 System.out.println(nombre + " ha recogido " + bateria);
 
                 // Volver a comprobar antes de soldar
-                supervisorCentral.esperarSiHayEmergencia();
+                supervisorCentral.esperarSiHayEmergencia(nombre);
 
                 int estacion = -1;
                 boolean estacionOcupada = false;
@@ -73,7 +73,7 @@ public class RobotTask implements Runnable {
                 }
 
                 // Comprobar antes de registrar el certificado
-                supervisorCentral.esperarSiHayEmergencia();
+                supervisorCentral.esperarSiHayEmergencia(nombre);
 
                 taulerRegistreCentral.registrarCertificat(nombre);
             }
