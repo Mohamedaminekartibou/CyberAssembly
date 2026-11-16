@@ -1,66 +1,76 @@
 
-
 package org.view;
 
 import org.model.concurrency.CentralSoldadura;
 import org.model.concurrency.CintaTransportadora;
 import org.model.concurrency.SupervisorCentral;
 
-    public class ConsoleView {
+public class ConsoleView {
 
-        public void mostrarEstado(
-                CentralSoldadura centralSoldadura,
-                CintaTransportadora cintaTransportadora,
-                SupervisorCentral supervisorCentral) {
+    public synchronized void mostrarEstado(
+            CentralSoldadura centralSoldadura,
+            CintaTransportadora cintaTransportadora,
+            SupervisorCentral supervisorCentral) {
 
-            boolean[] estaciones =
-                    centralSoldadura.getEstadoEstaciones();
+        boolean[] estaciones =
+                centralSoldadura.getEstadoEstaciones();
 
-            int ocupadas = 0;
-// Donar un poco de orden para  el trabajo
-            System.out.println();
-            System.out.println("======================================");
-            System.out.println("          ESTADO DE LA FÁBRICA");
-            System.out.println("======================================");
+        int ocupadas = 0;
 
-            // Mostrar estaciones
-            System.out.println("\nESTACIONES DE SOLDADURA:");
+        System.out.println();
+        System.out.println("ESTADO ACTUAL DE LA FÁBRICA");
+        System.out.println("---------------------------");
 
-            for (int i = 0; i < estaciones.length; i++) {
+        // Mostrar estaciones de soldadura
+        System.out.println("\nEstaciones de soldadura:");
 
-                if (estaciones[i]) {
-                    System.out.println("Estación " + (i + 1) + ": OCUPADA");
-                    ocupadas++;
-                } else {
-                    System.out.println("Estación " + (i + 1) + ": LIBRE");
-                }
-            }
+        for (int i = 0; i < estaciones.length; i++) {
 
-            System.out.println("Estaciones ocupadas: " + ocupadas
-                    + "/" + estaciones.length);
-
-            // Mostrar baterías
-            System.out.println("\nBATERÍAS EN LA CINTA:");
-
-            System.out.println("Normales: "
-                    + cintaTransportadora.getCantidadBateriasNormales());
-
-            System.out.println("Críticas: "
-                    + cintaTransportadora.getCantidadBateriasCriticas());
-
-            System.out.println("Total: "
-                    + cintaTransportadora.getCantidadBaterias()
-                    + "/" + cintaTransportadora.getCapacidad());
-
-            // Mostrar emergencia
-            System.out.println("\nESTADO DE SEGURIDAD:");
-
-            if (supervisorCentral.isEmergenciaActiva()) {
-                System.out.println("¡EMERGENCIA ACTIVA!");
+            if (estaciones[i]) {
+                System.out.println(
+                        "  Estación " + (i + 1) + ": Ocupada"
+                );
+                ocupadas++;
             } else {
-                System.out.println("Funcionamiento normal.");
+                System.out.println(
+                        "  Estación " + (i + 1) + ": Libre"
+                );
             }
-
-            System.out.println("======================================");
         }
+
+        System.out.println(
+                "  Total ocupadas: "
+                + ocupadas + "/" + estaciones.length
+        );
+
+        // Mostrar baterías de la cinta
+        System.out.println("\nCinta transportadora:");
+
+        System.out.println(
+                "  Baterías normales: "
+                + cintaTransportadora.getCantidadBateriasNormales()
+        );
+
+        System.out.println(
+                "  Baterías críticas: "
+                + cintaTransportadora.getCantidadBateriasCriticas()
+        );
+
+        System.out.println(
+                "  Total de baterías: "
+                + cintaTransportadora.getCantidadBaterias()
+                + "/" + cintaTransportadora.getCapacidad()
+        );
+
+        // Mostrar estado de seguridad
+        System.out.println("\nSeguridad:");
+
+        if (supervisorCentral.isEmergenciaActiva()) {
+            System.out.println("  ¡EMERGENCIA ACTIVA!");
+        } else {
+            System.out.println("  Funcionamiento normal");
+        }
+
+        System.out.println("---------------------------");
     }
+}
