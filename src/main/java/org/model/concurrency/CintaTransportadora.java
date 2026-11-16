@@ -1,6 +1,8 @@
 
 package org.model.concurrency;
 
+import org.model.Bateria;
+
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.locks.Condition;
@@ -9,7 +11,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class CintaTransportadora {
 
-    private final Queue<String> baterias;
+    private final Queue<Bateria> bateriasCriticas;
+    private final Queue<Bateria> bateriasNormales;
+
     private final int capacidad;
 
     private final Lock lock;
@@ -18,29 +22,46 @@ public class CintaTransportadora {
 
     public CintaTransportadora(int capacidad) {
 
+        if (capacidad <= 0) {
+            throw new IllegalArgumentException(
+                    "La capacidad debe ser mayor que cero."
+            );
+        }
+
         this.capacidad = capacidad;
-        this.baterias = new LinkedList<>();
+
+        this.bateriasCriticas = new LinkedList<>();
+        this.bateriasNormales = new LinkedList<>();
 
         this.lock = new ReentrantLock();
         this.cintaNoPlena = lock.newCondition();
         this.cintaNoBuida = lock.newCondition();
     }
 
-    // Los AGV introducen baterías
-    public void afegirBateria(String bateria)
+    public void afegirBateria(Bateria bateria)
             throws InterruptedException {
 
         lock.lock();
 
         try {
-
-            while (baterias.size() == capacidad) {
+            while (getCantidadBateriasInterno() == capacidad) {
                 cintaNoPlena.await();
             }
 
-            baterias.add(bateria);
+            if (bateria.esCritica()) {
+                bateriasCriticas.add(bateria);
 
-            System.out.println("Batería añadida: " + bateria);
+                System.out.println(
+                        "Batería crítica añadida: " + bateria
+                );
+
+            } else {
+                bateriasNormales.add(bateria);
+
+                System.out.println(
+                        "Batería normal añadida: " + bateria
+                );
+            }
 
             cintaNoBuida.signal();
 
@@ -49,19 +70,28 @@ public class CintaTransportadora {
         }
     }
 
-    // Los robots recogen baterías
-    public String recollirBateria()
+    public Bateria recollirBateria()
             throws InterruptedException {
 
         lock.lock();
 
         try {
-
-            while (baterias.isEmpty()) {
+            while (getCantidadBateriasInterno() == 0) {
                 cintaNoBuida.await();
             }
 
-            String bateria = baterias.poll();
+            Bateria bateria;
+
+            if (!bateriasCriticas.isEmpty()) {
+                bateria = bateriasCriticas.poll();
+
+                System.out.println(
+                        "Prioridad: recogiendo batería crítica."
+                );
+
+            } else {
+                bateria = bateriasNormales.poll();
+            }
 
             System.out.println("Batería recogida: " + bateria);
 
@@ -74,12 +104,17 @@ public class CintaTransportadora {
         }
     }
 
+    private int getCantidadBateriasInterno() {
+        return bateriasCriticas.size()
+                + bateriasNormales.size();
+    }
+
     public int getCantidadBaterias() {
 
         lock.lock();
 
         try {
-            return baterias.size();
+            return getCantidadBateriasInterno();
 
         } finally {
             lock.unlock();
