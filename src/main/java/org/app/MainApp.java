@@ -85,6 +85,30 @@ public class MainApp {
         hiloRobot1.start();
         hiloRobot2.start();
 
+
+        Thread hiloEmergencia = new Thread(() -> {
+
+            try {
+                // Esperar antes de activar la emergencia
+                Thread.sleep(1500);
+
+                supervisorCentral.activarEmergencia();
+
+                // Mantener la emergencia durante 4 segundos
+                Thread.sleep(4000);
+
+                supervisorCentral.resolverEmergencia();
+
+            } catch (InterruptedException e) {
+                System.out.println("El supervisor ha sido interrumpido.");
+                Thread.currentThread().interrupt();
+            }
+
+        });
+
+        hiloEmergencia.start();
+
+
         // Esperar a que todos los hilos terminen
         try {
             hiloAGV1.join();
@@ -92,6 +116,8 @@ public class MainApp {
 
             hiloRobot1.join();
             hiloRobot2.join();
+
+            hiloEmergencia.join();
 
         } catch (InterruptedException e) {
             System.out.println("El programa principal ha sido interrumpido.");

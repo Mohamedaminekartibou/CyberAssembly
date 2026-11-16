@@ -37,59 +37,56 @@ public class RobotTask implements Runnable {
         System.out.println(nombre + " ha comenzado a trabajar.");
 
         try {
-
             for (int i = 1; i <= cochesAFabricar; i++) {
 
-                // Comprobar si hay una emergencia
+                // Comprobar si existe una emergencia
                 supervisorCentral.esperarSiHayEmergencia();
 
                 System.out.println(nombre + " solicita una batería.");
 
-                // Recoger una batería
                 String bateria = cintaTransportadora.recollirBateria();
 
                 System.out.println(nombre + " ha recogido " + bateria);
+
+                // Volver a comprobar antes de soldar
+                supervisorCentral.esperarSiHayEmergencia();
 
                 int estacion = -1;
                 boolean estacionOcupada = false;
 
                 try {
-
-                    // Solicitar una estación de soldadura
                     estacion = centralSoldadura.ocuparEstacion();
                     estacionOcupada = true;
 
                     System.out.println(nombre +
                             " está soldando en la estación " + (estacion + 1));
 
-                    // Simular el tiempo de soldadura
                     Thread.sleep(2000);
 
                     System.out.println(nombre +
                             " ha terminado de fabricar el coche " + i);
 
                 } finally {
-
-                    // Liberar la estación
                     if (estacionOcupada) {
                         centralSoldadura.liberarEstacion(estacion);
                     }
                 }
 
-                // Registrar el certificado de calidad
-                taulerRegistreCentral.registrarCertificat(nombre);
+                // Comprobar antes de registrar el certificado
+                supervisorCentral.esperarSiHayEmergencia();
 
+                taulerRegistreCentral.registrarCertificat(nombre);
             }
 
         } catch (InterruptedException e) {
 
             System.out.println(nombre + " ha sido interrumpido.");
             Thread.currentThread().interrupt();
-
         }
 
         System.out.println(nombre + " ha terminado su trabajo.");
     }
+
 
 
 }
