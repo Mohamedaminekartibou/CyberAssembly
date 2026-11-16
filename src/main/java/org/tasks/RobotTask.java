@@ -1,6 +1,8 @@
 
 package org.tasks;
 
+import org.model.Bateria;
+
 import org.model.concurrency.CentralSoldadura;
 import org.model.concurrency.CintaTransportadora;
 import org.model.concurrency.SupervisorCentral;
@@ -44,7 +46,7 @@ public class RobotTask implements Runnable {
 
                 System.out.println(nombre + " solicita una batería.");
 
-                String bateria = cintaTransportadora.recollirBateria();
+                Bateria bateria = cintaTransportadora.recollirBateria();
 
                 System.out.println(nombre + " ha recogido " + bateria);
 
