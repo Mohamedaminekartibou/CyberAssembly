@@ -124,4 +124,34 @@ public class CintaTransportadora {
     public int getCapacidad() {
         return capacidad;
     }
+
+
+
+
+    public int getCantidadBateriasCriticas() {
+
+        lock.lock();
+
+        try {
+            return bateriasCriticas.size();
+
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public int getCantidadBateriasNormales() {
+
+        lock.lock();
+
+        try {
+            return bateriasNormales.size();
+
+        } finally {
+            lock.unlock();
+        }
+    }
+
+
+
 }

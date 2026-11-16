@@ -7,44 +7,68 @@ import org.model.concurrency.SupervisorCentral;
 
 public class ConsoleView {
 
-    public void mostrarEstado(
-            CentralSoldadura centralSoldadura,
-            CintaTransportadora cintaTransportadora,
-            SupervisorCentral supervisorCentral) {
 
+package org.view;
 
+import org.model.concurrency.CentralSoldadura;
+import org.model.concurrency.CintaTransportadora;
+import org.model.concurrency.SupervisorCentral;
 
-        System.out.println("       ESTADO DE LA FÁBRICA");
+    public class ConsoleView {
 
+        public void mostrarEstado(
+                CentralSoldadura centralSoldadura,
+                CintaTransportadora cintaTransportadora,
+                SupervisorCentral supervisorCentral) {
 
-        // Mostrar estaciones de soldadura
-        boolean[] estaciones = centralSoldadura.getEstadoEstaciones();
+            boolean[] estaciones =
+                    centralSoldadura.getEstadoEstaciones();
 
-        System.out.println("\nESTACIONES DE SOLDADURA:");
+            int ocupadas = 0;
 
-        for (int i = 0; i < estaciones.length; i++) {
+            System.out.println();
+            System.out.println("======================================");
+            System.out.println("          ESTADO DE LA FÁBRICA");
+            System.out.println("======================================");
 
-            if (estaciones[i]) {
-                System.out.println("Estación " + (i + 1) + ": OCUPADA");
-            } else {
-                System.out.println("Estación " + (i + 1) + ": LIBRE");
+            // Mostrar estaciones
+            System.out.println("\nESTACIONES DE SOLDADURA:");
+
+            for (int i = 0; i < estaciones.length; i++) {
+
+                if (estaciones[i]) {
+                    System.out.println("Estación " + (i + 1) + ": OCUPADA");
+                    ocupadas++;
+                } else {
+                    System.out.println("Estación " + (i + 1) + ": LIBRE");
+                }
             }
+
+            System.out.println("Estaciones ocupadas: " + ocupadas
+                    + "/" + estaciones.length);
+
+            // Mostrar baterías
+            System.out.println("\nBATERÍAS EN LA CINTA:");
+
+            System.out.println("Normales: "
+                    + cintaTransportadora.getCantidadBateriasNormales());
+
+            System.out.println("Críticas: "
+                    + cintaTransportadora.getCantidadBateriasCriticas());
+
+            System.out.println("Total: "
+                    + cintaTransportadora.getCantidadBaterias()
+                    + "/" + cintaTransportadora.getCapacidad());
+
+            // Mostrar emergencia
+            System.out.println("\nESTADO DE SEGURIDAD:");
+
+            if (supervisorCentral.isEmergenciaActiva()) {
+                System.out.println("¡EMERGENCIA ACTIVA!");
+            } else {
+                System.out.println("Funcionamiento normal.");
+            }
+
+            System.out.println("======================================");
         }
-
-        // Mostrar baterías disponibles
-        System.out.println("\nBATERÍAS EN LA CINTA: " + cintaTransportadora.getCantidadBaterias()
-                + "/" + cintaTransportadora.getCapacidad());
-
-        // Mostrar estado de emergencia
-        System.out.println("\nESTADO DE SEGURIDAD:");
-
-        if (supervisorCentral.isEmergenciaActiva()) {
-            System.out.println("¡EMERGENCIA ACTIVA!");
-        } else {
-            System.out.println("Funcionamiento normal.");
-        }
-
-        System.out.println("");
-        System.out.println();
     }
-}

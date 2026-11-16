@@ -1,6 +1,8 @@
 
 package org.app;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.model.concurrency.CentralSoldadura;
 import org.model.concurrency.CintaTransportadora;
 import org.model.concurrency.SupervisorCentral;
@@ -29,14 +31,7 @@ public class MainApp {
         // Crear la vista de consola
         ConsoleView consoleView = new ConsoleView();
 
-
-        System.out.println("     INICIO DE LA FÁBRICA");
-
-        consoleView.mostrarEstado(
-                centralSoldadura,
-                cintaTransportadora,
-                supervisorCentral
-        );
+        System.out.println("INICIO DE LA FÁBRICA");
 
         // Crear las tareas de los robots
         RobotTask robot1 = new RobotTask(
@@ -77,6 +72,31 @@ public class MainApp {
         Thread hiloAGV1 = new Thread(agv1);
         Thread hiloAGV2 = new Thread(agv2);
 
+        // Controlar el funcionamiento del panel
+        AtomicBoolean panelActivo = new AtomicBoolean(true);
+
+        // Crear el hilo del panel de control
+        Thread hiloPanel = new Thread(() -> {
+
+            while (panelActivo.get()) {
+
+                consoleView.mostrarEstado(
+                        centralSoldadura,
+                        cintaTransportadora,
+                        supervisorCentral
+                );
+
+                try {
+                    Thread.sleep(1000);
+
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+
+        }, "Panel-Control");
+
         // Iniciar los hilos de los AGV
         hiloAGV1.start();
         hiloAGV2.start();
@@ -85,31 +105,33 @@ public class MainApp {
         hiloRobot1.start();
         hiloRobot2.start();
 
-
+        // Crear el hilo de emergencia
         Thread hiloEmergencia = new Thread(() -> {
 
             try {
-                // Esperar antes de activar la emergencia
                 Thread.sleep(1500);
 
                 supervisorCentral.activarEmergencia();
 
-                // Mantener la emergencia durante 4 segundos
                 Thread.sleep(4000);
 
                 supervisorCentral.resolverEmergencia();
 
             } catch (InterruptedException e) {
-                System.out.println("El supervisor ha sido interrumpido.");
+                System.out.println(
+                        "El supervisor ha sido interrumpido."
+                );
                 Thread.currentThread().interrupt();
             }
 
-        });
+        }, "Supervisor-Emergencia");
 
         hiloEmergencia.start();
 
+        // Iniciar el panel de control
+        hiloPanel.start();
 
-        // Esperar a que todos los hilos terminen
+        // Esperar a que todos los trabajadores terminen
         try {
             hiloAGV1.join();
             hiloAGV2.join();
@@ -120,14 +142,28 @@ public class MainApp {
             hiloEmergencia.join();
 
         } catch (InterruptedException e) {
-            System.out.println("El programa principal ha sido interrumpido.");
+            System.out.println(
+                    "El programa principal ha sido interrumpido."
+            );
+
+            Thread.currentThread().interrupt();
+
+        } finally {
+
+            // Detener el panel de control
+            panelActivo.set(false);
+        }
+
+        // Esperar a que termine el panel
+        try {
+            hiloPanel.join();
+
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
 
         // Mostrar el estado final
-        System.out.println("\n");
-        System.out.println("       FÁBRICA FINALIZADA");
-        System.out.println("");
+        System.out.println("\nFÁBRICA FINALIZADA");
 
         consoleView.mostrarEstado(
                 centralSoldadura,
