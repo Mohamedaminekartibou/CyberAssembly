@@ -1,12 +1,4 @@
 
-package org.view;
-
-import org.model.concurrency.CentralSoldadura;
-import org.model.concurrency.CintaTransportadora;
-import org.model.concurrency.SupervisorCentral;
-
-public class ConsoleView {
-
 
 package org.view;
 
@@ -25,7 +17,7 @@ import org.model.concurrency.SupervisorCentral;
                     centralSoldadura.getEstadoEstaciones();
 
             int ocupadas = 0;
-
+// Donar un poco de orden para  el trabajo
             System.out.println();
             System.out.println("======================================");
             System.out.println("          ESTADO DE LA FÁBRICA");

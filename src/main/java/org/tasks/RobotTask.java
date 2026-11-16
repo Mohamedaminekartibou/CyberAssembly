@@ -89,8 +89,6 @@ public class RobotTask implements Runnable {
         System.out.println(nombre + " ha terminado su trabajo.");
     }
 
-
-
 }
 
 /* Orden
